@@ -23,7 +23,6 @@ import NitroValuesVideoPlayer from "@/components/Ads/NitroValuesVideoPlayer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
-import router from "next/navigation";
 
 interface ValuesClientProps {
   itemsPromise: Promise<Item[]>;
