@@ -638,6 +638,25 @@ export async function fetchItemById(id: string): Promise<ItemDetails | null> {
   }
 }
 
+export async function fetchRandomItem(): Promise<ItemDetails | null> {
+  try {
+    const response = await fetch(`${BASE_API_URL}/items/random`);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data as ItemDetails;
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      return null;
+    }
+    log.error("Error fetching random item", err);
+    return null;
+  }
+}
+
 export async function fetchChangelogList(): Promise<Changelog[]> {
   const response = await fetch(`${BASE_API_URL}/changelogs`, {
     credentials: "include",

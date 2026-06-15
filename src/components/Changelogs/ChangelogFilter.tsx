@@ -147,6 +147,21 @@ const ChangelogFilter: React.FC<ChangelogFilterProps> = ({
             <span>View Timeline</span>
           </Link>
         </Button>
+
+        <Button
+          variant="default"
+          onClick={() => {
+            const randomIndex = Math.floor(
+              Math.random() * changelogList.length,
+            );
+            const randomChangelog = changelogList[randomIndex];
+            onChangelogSelect(randomChangelog.id.toString());
+            toast.success(`Navigated to changelog #${randomChangelog.id}`);
+          }}
+        >
+          <Icon icon="heroicons-solid:clock" className="h-4 w-4" />
+          <span>Random Changelog</span>
+        </Button>
       </div>
     </div>
   );

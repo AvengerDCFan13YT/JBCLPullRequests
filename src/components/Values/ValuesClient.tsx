@@ -2,6 +2,7 @@
 
 import { createLogger } from "@/services/logger";
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 const log = createLogger("UI");
 import { use } from "react";
@@ -9,7 +10,7 @@ import { Icon } from "@/components/ui/IconWrapper";
 import { Item, FilterSort, FavoriteItem } from "@/types";
 import { sortAndFilterItems, parseCashValue } from "@/utils/trading/values";
 import CategoryIcons from "@/components/Items/CategoryIcons";
-import { fetchUserFavorites } from "@/utils/api/api";
+import { fetchUserFavorites, fetchRandomItem } from "@/utils/api/api";
 import { useAuthContext } from "@/contexts/AuthContext";
 import TradingGuides from "./TradingGuides";
 import ValuesSearchControls from "./ValuesSearchControls";
@@ -21,6 +22,8 @@ import { valueSortOptions } from "./valuesSortOptions";
 import NitroValuesVideoPlayer from "@/components/Ads/NitroValuesVideoPlayer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
+import router from "next/navigation";
 
 interface ValuesClientProps {
   itemsPromise: Promise<Item[]>;
@@ -32,7 +35,7 @@ export default function ValuesClient({
   lastUpdatedPromise,
 }: ValuesClientProps) {
   const { user } = useAuthContext();
-
+  const router = useRouter();
   const items = use(itemsPromise);
   const lastUpdated = use(lastUpdatedPromise);
 
@@ -140,7 +143,15 @@ export default function ValuesClient({
     };
     updateSortedItems();
   }, [items, debouncedSearchTerm, filterSort, valueSort, favorites]);
-
+  const handleRandomItem = async () => {
+    const item = await fetchRandomItem();
+    if (item) {
+      router.push(`/item/${item.type}/${item.name}`);
+      toast.success(`Redirected to ${item.name}`);
+    } else {
+      toast.error("Couldn't fetch a random item, try again");
+    }
+  };
   return (
     <ValuesErrorBoundary>
       <div className="border-border-card bg-secondary-bg mb-8 rounded-lg border p-6">
@@ -179,11 +190,14 @@ export default function ValuesClient({
                   Hyperchrome Pity Calculator
                 </Link>
               </Button>
-              <Button asChild>
-                <Link href="/values/suggestions" prefetch={false}>
-                  Value Suggestions
-                </Link>
+              <Button variant="default" onClick={handleRandomItem}>
+                <Icon
+                  icon="heroicons-solid:arrow-top-right-on-square"
+                  className="h-4 w-4"
+                />
+                <span>Random Item</span>
               </Button>
+              <Button asChild></Button>
             </div>
 
             <Link
