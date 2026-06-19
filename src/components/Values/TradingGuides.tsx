@@ -6,6 +6,12 @@ import { Icon } from "@/components/ui/IconWrapper";
 import { demandOrder, trendOrder } from "@/utils/trading/values";
 import { ValueSort } from "@/types";
 import { trendDescriptions } from "@/utils/trading/tradingDefinitions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TradingGuidesProps {
   valueSort: ValueSort;
@@ -50,14 +56,44 @@ export default function TradingGuides({
       description:
         "The highest value an item can consistently obtain in trades based on current market demand and offers",
     },
-    { term: "LF", description: "Looking for" },
-    { term: "D", description: "Duped; items that are duped" },
-    { term: "C", description: "Clean; items that are not duped" },
-    { term: "TR", description: "Trading" },
-    { term: "IA", description: "Instant accept" },
-    { term: "AA", description: "Auto Accept" },
-    { term: "MLF", description: "Mainly looking for" },
-    { term: "NLF", description: "Not looking for" },
+    { term: "LF", description: "Looking for", example: "LF Javelin" },
+    { term: "OP", description: "Overpay", example: "TR Javelin for OP" },
+    {
+      term: "D",
+      description: "Duped; items that are duped",
+      example: "TR C Torpedo for D Javelin",
+    },
+    {
+      term: "C",
+      description: "Clean; items that are not duped",
+      example: "LF C Torpedo",
+    },
+    { term: "TR", description: "Trading", example: "TR Crew Capsule" },
+    {
+      term: "IA",
+      description: "Instant accept",
+      example: "TR Iceborn IA: Orion",
+    },
+    {
+      term: "AA",
+      description: "Auto Accept",
+      example: "TR Roadster AA: Successor",
+    },
+    {
+      term: "MLF",
+      description: "Mainly looking for",
+      example: "TR Orion MLF Iceborn+Adds",
+    },
+    {
+      term: "NLF",
+      description: "Not looking for",
+      example: "TR Icebreaker NLF OBT",
+    },
+    {
+      term: "OBT",
+      description: "Obtainables",
+      example: "TR OBT for Downgrade",
+    },
     {
       term: "W",
       description:
@@ -73,7 +109,7 @@ export default function TradingGuides({
       description: "Fair; a trade balanced in value and/or demand",
     },
     {
-      term: "WFL",
+      term: "W/F/L",
       description:
         "Win/Fair/Loss. Asking if a particular trade is or was good (e.g: Was this a win, fair, or loss?)",
     },
@@ -203,6 +239,29 @@ export default function TradingGuides({
       onValueSortChange(trendValue as ValueSort);
     }
     onScrollToSearch();
+  };
+
+  const highlightTradingTerm = (text: string, term: string) => {
+    if (!term || !text) return text;
+
+    // Escaping the term for regex
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    // Removed 'i' flag to make it case-sensitive
+    const regex = new RegExp(`(${escapedTerm})`, "g");
+    const parts = text.split(regex);
+
+    return parts.map((part, index) => {
+      // Exact match check (case-sensitive)
+      if (part === term) {
+        return (
+          <span key={index} className="text-link font-bold">
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
   };
 
   return (
@@ -363,9 +422,35 @@ export default function TradingGuides({
                   {tradingTerms.map((item) => (
                     <div
                       key={item.term}
-                      className="border-border-secondary border-b pb-3 last:border-0 md:border-0 md:pb-0"
+                      className="border-border-secondary flex items-center gap-2 border-b pb-3 last:border-0 md:border-0 md:pb-0"
                     >
-                      <span className="text-link font-bold">{item.term}: </span>
+                      <div className="relative flex items-center shrink-0 ml-4">
+                        {item.example && (
+                          <div className="absolute -left-6 top-1/2 -translate-y-1/2">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="bg-tertiary-bg hover:bg-quaternary-bg text-secondary-text hover:text-primary-text flex cursor-help items-center justify-center p-1 transition-colors duration-200">
+                                    <Icon
+                                      icon="mdi:help-circle-outline"
+                                      className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+                                    />
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="left">
+                                  {highlightTradingTerm(
+                                    item.example,
+                                    item.term,
+                                  )}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        )}
+                        <span className="text-link font-bold">
+                          {item.term}:{" "}
+                        </span>
+                      </div>
                       <span className="text-secondary-text text-sm">
                         {item.description}
                       </span>
