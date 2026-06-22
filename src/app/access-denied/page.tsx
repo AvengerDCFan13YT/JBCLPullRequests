@@ -20,13 +20,11 @@ export const metadata: Metadata = {
 };
 
 export default function AccessDeniedPage() {
-  // 1. Fetch the random background image URL on the server
   const backgroundImage = getRandomBackgroundImage();
 
   return (
     <main
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat px-6"
-      // 2. Pass the URL as an inline style
       style={{ backgroundImage: `url('${backgroundImage}')` }}
     >
       <AccessDeniedAutoRedirect />
