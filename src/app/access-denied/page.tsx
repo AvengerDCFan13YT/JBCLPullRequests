@@ -4,6 +4,7 @@ import { Icon } from "@/components/ui/IconWrapper";
 import { Button } from "@/components/ui/button";
 import AccessDeniedLoginButton from "@/components/Auth/AccessDeniedLoginButton";
 import AccessDeniedAutoRedirect from "@/components/Auth/AccessDeniedAutoRedirect";
+import { getRandomBackgroundImage } from "@/utils/helpers/fisherYatesShuffle";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -19,8 +20,15 @@ export const metadata: Metadata = {
 };
 
 export default function AccessDeniedPage() {
+  // 1. Fetch the random background image URL on the server
+  const backgroundImage = getRandomBackgroundImage();
+
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[url('/backgrounds/v2/background31.webp')] bg-cover bg-center bg-no-repeat px-6">
+    <main
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat px-6"
+      // 2. Pass the URL as an inline style
+      style={{ backgroundImage: `url('${backgroundImage}')` }}
+    >
       <AccessDeniedAutoRedirect />
       <div className="absolute inset-0 bg-[url('/backgrounds/vignette.png')] bg-cover bg-center bg-no-repeat opacity-70" />
       <div className="absolute inset-0 bg-black/70" />
