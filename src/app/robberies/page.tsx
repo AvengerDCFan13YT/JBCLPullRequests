@@ -977,7 +977,6 @@ function RobberyTrackerContent() {
     selectedRobberyTypes.length > 0 ||
     serverSize !== "all";
   const selectedTypeSetForRender = new Set(selectedRobberyTypes);
-
   return (
     <>
       <NitroRobberiesRailAd />
@@ -1000,33 +999,34 @@ function RobberyTrackerContent() {
                 {/* Search and Filters Row */}
                 <div className="flex flex-col gap-4 lg:flex-row lg:gap-4">
                   {/* Search Input */}
-                  <div className="w-full lg:w-1/3">
-                    <div className="relative">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Icon
-                          icon="heroicons:magnifying-glass"
-                          className="text-secondary-text h-5 w-5"
+                  {activeView === "robberies" && (
+                    <div className="w-full lg:w-1/3">
+                      <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                          <Icon
+                            icon="heroicons:magnifying-glass"
+                            className="text-secondary-text h-5 w-5"
+                          />
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Search robberies..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="border-border-card bg-secondary-bg text-primary-text placeholder-secondary-text hover:border-border-focus focus:border-button-info h-14 w-full rounded-lg border px-4 py-2 pr-10 pl-10 transition-all focus:outline-none"
                         />
+                        {searchQuery && (
+                          <button
+                            onClick={() => setSearchQuery("")}
+                            className="text-secondary-text hover:text-primary-text absolute top-1/2 right-3 -translate-y-1/2"
+                            aria-label="Clear search"
+                          >
+                            <Icon icon="heroicons:x-mark" className="h-5 w-5" />
+                          </button>
+                        )}
                       </div>
-                      <input
-                        type="text"
-                        placeholder="Search robberies..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="border-border-card bg-secondary-bg text-primary-text placeholder-secondary-text hover:border-border-focus focus:border-button-info h-14 w-full rounded-lg border px-4 py-2 pr-10 pl-10 transition-all focus:outline-none"
-                      />
-                      {searchQuery && (
-                        <button
-                          onClick={() => setSearchQuery("")}
-                          className="text-secondary-text hover:text-primary-text absolute top-1/2 right-3 -translate-y-1/2"
-                          aria-label="Clear search"
-                        >
-                          <Icon icon="heroicons:x-mark" className="h-5 w-5" />
-                        </button>
-                      )}
                     </div>
-                  </div>
-
+                  )}
                   {/* Filter Dropdowns */}
                   <div className="grid w-full grid-cols-2 gap-4 lg:flex lg:flex-1 lg:flex-row lg:gap-4">
                     {/* Server Size Filter */}
@@ -1079,52 +1079,54 @@ function RobberyTrackerContent() {
                     </div>
 
                     {/* Time Sort Dropdown */}
-                    <div className="col-span-full w-full lg:col-span-1 lg:flex-1">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            className="border-border-card bg-secondary-bg text-primary-text focus:border-button-info focus:ring-button-info/50 hover:border-border-focus flex h-14 w-full items-center justify-between rounded-lg border px-4 py-2 text-sm transition-all focus:ring-1 focus:outline-none"
-                            aria-label="Sort by time"
-                          >
-                            <span className="truncate">{timeSortLabel}</span>
-                            <Icon
-                              icon="heroicons:chevron-down"
-                              className="text-secondary-text h-5 w-5"
-                            />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="start"
-                          className="border-border-card bg-secondary-bg text-primary-text max-h-60 w-(--radix-popper-anchor-width) min-w-(--radix-popper-anchor-width) scrollbar-thin overflow-x-hidden overflow-y-auto rounded-xl border p-1 shadow-lg"
-                        >
-                          <DropdownMenuRadioGroup
-                            value={timeSort}
-                            onValueChange={(value) => {
-                              const nextValue = value as TimeSort;
-                              if (activeView === "robberies") {
-                                setRobberiesTimeSort(nextValue);
-                                return;
-                              }
-                              setOtherTimeSort(nextValue);
-                            }}
-                          >
-                            <DropdownMenuRadioItem
-                              value="newest"
-                              className="focus:bg-quaternary-bg focus:text-primary-text cursor-pointer rounded-lg px-3 py-2 text-sm"
+                    {activeView === "robberies" && (
+                      <div className="col-span-full w-full lg:col-span-1 lg:flex-1">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              className="border-border-card bg-secondary-bg text-primary-text focus:border-button-info focus:ring-button-info/50 hover:border-border-focus flex h-14 w-full items-center justify-between rounded-lg border px-4 py-2 text-sm transition-all focus:ring-1 focus:outline-none"
+                              aria-label="Sort by time"
                             >
-                              Logged (Newest to Oldest)
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem
-                              value="oldest"
-                              className="focus:bg-quaternary-bg focus:text-primary-text cursor-pointer rounded-lg px-3 py-2 text-sm"
+                              <span className="truncate">{timeSortLabel}</span>
+                              <Icon
+                                icon="heroicons:chevron-down"
+                                className="text-secondary-text h-5 w-5"
+                              />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="start"
+                            className="border-border-card bg-secondary-bg text-primary-text max-h-60 w-(--radix-popper-anchor-width) min-w-(--radix-popper-anchor-width) scrollbar-thin overflow-x-hidden overflow-y-auto rounded-xl border p-1 shadow-lg"
+                          >
+                            <DropdownMenuRadioGroup
+                              value={timeSort}
+                              onValueChange={(value) => {
+                                const nextValue = value as TimeSort;
+                                if (activeView === "robberies") {
+                                  setRobberiesTimeSort(nextValue);
+                                  return;
+                                }
+                                setOtherTimeSort(nextValue);
+                              }}
                             >
-                              Logged (Oldest to Newest)
-                            </DropdownMenuRadioItem>
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                              <DropdownMenuRadioItem
+                                value="newest"
+                                className="focus:bg-quaternary-bg focus:text-primary-text cursor-pointer rounded-lg px-3 py-2 text-sm"
+                              >
+                                Logged (Newest to Oldest)
+                              </DropdownMenuRadioItem>
+                              <DropdownMenuRadioItem
+                                value="oldest"
+                                className="focus:bg-quaternary-bg focus:text-primary-text cursor-pointer rounded-lg px-3 py-2 text-sm"
+                              >
+                                Logged (Oldest to Newest)
+                              </DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
