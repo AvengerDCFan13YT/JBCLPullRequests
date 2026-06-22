@@ -201,6 +201,7 @@ export default async function Home() {
       label: "Users",
       icon: "mdi:account-group",
       value: homepageStats?.total_users ?? 0,
+      badge: "All time",
     },
     {
       label: "Items Tracked",
