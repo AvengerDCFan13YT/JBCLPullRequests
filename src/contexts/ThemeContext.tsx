@@ -4,11 +4,16 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { safeLocalStorage } from "@/utils/storage/safeStorage";
 import { debounce } from "@/utils/helpers/debounce";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "amoled";
 
 // Spamming the toggle shouldn't spam the realtime WS with one
 // "set_preference" message per click — wait for clicks to settle first.
 const THEME_SYNC_DEBOUNCE_MS = 500;
+
+// After a user-initiated change, ignore incoming WS preference echoes for this
+// long. Covers the debounce window + a generous server round-trip buffer so a
+// stale echo can't revert the theme the user just set.
+const THEME_SYNC_BLOCK_MS = THEME_SYNC_DEBOUNCE_MS + 1000;
 
 interface ThemeContextType {
   theme: Theme;
@@ -18,46 +23,35 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
+
+  const savedTheme = safeLocalStorage.getItem("theme");
+
+  if (savedTheme === "system") {
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    const migratedTheme = prefersDark ? "dark" : "light";
+    safeLocalStorage.setItem("theme", migratedTheme);
+    return migratedTheme;
+  } else if (savedTheme && ["light", "dark", "amoled"].includes(savedTheme)) {
+    return savedTheme as Theme;
+  }
+
+  return "dark";
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const getInitialTheme = (): Theme => {
-    if (typeof window === "undefined") return "dark";
-
-    const savedTheme = safeLocalStorage.getItem("theme");
-    const hasBeenMigrated = safeLocalStorage.getItem(
-      "theme-christmas-removal-migration",
-    );
-
-    // One-time migration: if user has Christmas theme but hasn't been migrated yet,
-    // switch them to dark theme
-    if (!hasBeenMigrated && savedTheme === "christmas") {
-      safeLocalStorage.setItem("theme-christmas-removal-migration", "done");
-      safeLocalStorage.setItem("theme", "dark");
-      return "dark";
-    }
-
-    // Mark migration as done for users who already had light/dark theme or no theme
-    if (!hasBeenMigrated) {
-      safeLocalStorage.setItem("theme-christmas-removal-migration", "done");
-    }
-
-    if (savedTheme === "system") {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      const migratedTheme = prefersDark ? "dark" : "light";
-      safeLocalStorage.setItem("theme", migratedTheme);
-      return migratedTheme;
-    } else if (savedTheme && ["light", "dark"].includes(savedTheme)) {
-      return savedTheme as Theme;
-    }
-
-    return "dark";
-  };
-
   // Always start with "dark" to match the server render and avoid hydration
   // mismatches. The actual theme is read from localStorage in useEffect below.
   const [theme, setThemeState] = useState<Theme>("dark");
-  const resolvedTheme = theme;
+  const resolvedTheme: "light" | "dark" = theme === "light" ? "light" : "dark";
+
+  // Timestamp of the last user-initiated change. Incoming WS echoes arriving
+  // within THEME_SYNC_BLOCK_MS of this are ignored to prevent stale echoes
+  // from reverting what the user just set.
+  const lastUserChangeRef = useRef<number>(0);
 
   const dispatchThemeSyncRef = useRef(
     debounce((newTheme: Theme) => {
@@ -76,24 +70,37 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove("light", "dark");
+    root.classList.remove("light", "dark", "amoled");
     root.classList.add(theme);
     safeLocalStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Apply incoming preference syncs from other devices without re-broadcasting
+  // Apply incoming preference syncs from other devices without re-broadcasting.
+  // Skip any echo that arrives while a local change is still in-flight.
   useEffect(() => {
+    const isBlocked = () =>
+      Date.now() - lastUserChangeRef.current < THEME_SYNC_BLOCK_MS;
+
     const handlePreferenceUpdate = (e: Event) => {
       const { key, value } = (e as CustomEvent<{ key: string; value: unknown }>)
         .detail;
-      if (key === "theme" && (value === "light" || value === "dark")) {
+      if (
+        key === "theme" &&
+        !isBlocked() &&
+        (value === "light" || value === "dark" || value === "amoled")
+      ) {
         setThemeState(value);
       }
     };
     const handlePreferences = (e: Event) => {
+      if (isBlocked()) return;
       const prefs = (e as CustomEvent<Record<string, unknown>>).detail;
       const incoming = prefs?.theme;
-      if (incoming === "light" || incoming === "dark") {
+      if (
+        incoming === "light" ||
+        incoming === "dark" ||
+        incoming === "amoled"
+      ) {
         setThemeState(incoming);
       }
     };
@@ -105,9 +112,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // User-initiated theme change — apply locally right away, but debounce the
-  // WS sync so rapid toggling doesn't fire a "set_preference" per click.
+  // User-initiated theme change — apply locally right away, stamp the change
+  // time so WS echoes can't revert it, and debounce the actual WS dispatch.
   const setTheme = (newTheme: Theme) => {
+    if (newTheme === theme) return;
+    lastUserChangeRef.current = Date.now();
     setThemeState(newTheme);
     dispatchThemeSyncRef.current(newTheme);
   };

@@ -39,6 +39,16 @@ export default function HyperchromeCalculatorModal({
     { name: "HyperPurple", robbery: "Power Plant" },
     { name: "HyperPink", robbery: "Crown Jewel" },
   ];
+  const hyperchromeBgColors: Record<string, string> = {
+    HyperRed: "hsla(358, 99%, 53%, 0.1)",
+    HyperOrange: "hsla(45, 87%, 66%, 0.1)",
+    HyperYellow: "hsla(57, 99%, 59%, 0.1)",
+    HyperGreen: "hsla(119, 100%, 60%, 0.1)",
+    HyperDiamond: "hsla(180, 99%, 51%, 0.1)",
+    HyperBlue: "hsla(275, 99%, 52%, 0.1)",
+    HyperPurple: "hsla(296, 88%, 78%, 0.1)",
+    HyperPink: "hsla(327, 93%, 54%, 0.1)",
+  };
   const hyperchromeBorderColors: Record<string, string> = {
     HyperRed: "hsl(358, 99%, 53%)",
     HyperOrange: "hsl(45, 87%, 66%)",
@@ -249,7 +259,7 @@ export default function HyperchromeCalculatorModal({
             id="level"
             min={0}
             max={4}
-            className="border-border-card bg-form-input text-primary-text focus:border-button-info w-full rounded border p-3 text-sm focus:outline-none"
+            className="border-border-card bg-tertiary-bg text-primary-text focus:border-button-info w-full rounded border p-3 text-sm focus:outline-none"
             placeholder="Enter your hyperchrome level (0-4)"
             value={level}
             onChange={(e) => setLevel(e.target.value)}
@@ -273,7 +283,7 @@ export default function HyperchromeCalculatorModal({
             min={0}
             max={100}
             step="any"
-            className="border-border-card bg-form-input text-primary-text focus:border-button-info w-full rounded border p-3 text-sm focus:outline-none"
+            className="border-border-card bg-tertiary-bg text-primary-text focus:border-button-info w-full rounded border p-3 text-sm focus:outline-none"
             placeholder={`Enter your current ${isSmallServer ? "small" : "big"} server pity %`}
             value={pity}
             onChange={(e) => setPity(e.target.value)}
@@ -616,19 +626,44 @@ export default function HyperchromeCalculatorModal({
                     const robberiesDone = (resultPity / 100) * currentPityBase;
                     const publicPity =
                       (robberiesDone / HYPERCHROME_PITY_PUBLIC[lvlNum]) * 100;
-
-                    if (publicPity > 100) return null;
+                    const isGuaranteed = publicPity >= 100;
+                    const cappedPct = Math.min(publicPity, 100);
+                    const barColor =
+                      cappedPct >= 66
+                        ? "var(--color-form-success)"
+                        : cappedPct >= 33
+                          ? "var(--color-warning)"
+                          : "var(--color-button-danger)";
 
                     return (
                       <div
                         key={lvlNum}
-                        className="border-border-card bg-secondary-bg rounded-lg border p-3 text-center"
+                        className="border-border-card bg-secondary-bg flex flex-col gap-2 rounded-lg border p-3"
                       >
-                        <div className="text-primary-text text-lg font-bold">
+                        <div className="text-secondary-text text-[11px] font-semibold tracking-wider uppercase">
                           Level {lvlNum}
                         </div>
-                        <div className="text-secondary-text text-sm">
-                          {publicPity.toFixed(2)}% pity
+                        <div
+                          className="text-xl font-black"
+                          style={{ color: barColor }}
+                        >
+                          {isGuaranteed ? "100%" : `${publicPity.toFixed(2)}%`}
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <div className="bg-button-secondary h-1.5 w-full overflow-hidden rounded-full">
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${cappedPct}%`,
+                                backgroundColor: barColor,
+                              }}
+                            />
+                          </div>
+                          <div className="text-secondary-text text-xs">
+                            {isGuaranteed
+                              ? "Guaranteed next roll"
+                              : "Public pity"}
+                          </div>
                         </div>
                       </div>
                     );
@@ -690,14 +725,12 @@ export default function HyperchromeCalculatorModal({
                 <tr className="border-border-card border-b">
                   <th className="px-2 py-2 text-left font-semibold">Level</th>
                   <th className="px-2 py-2 text-left font-semibold">
-                    Chance per Roll (Production)
+                    Chance per Roll
                   </th>
                   <th className="px-2 py-2 text-left font-semibold">
                     Approx. %
                   </th>
-                  <th className="px-2 py-2 text-left font-semibold">
-                    Pity (Production)
-                  </th>
+                  <th className="px-2 py-2 text-left font-semibold">Pity</th>
                   <th className="px-2 py-2 text-left font-semibold">
                     Pity (Small/Private)
                   </th>
@@ -734,10 +767,12 @@ export default function HyperchromeCalculatorModal({
               return (
                 <div
                   key={item.name}
-                  className="bg-secondary-bg flex items-center gap-3 rounded-lg border-2 p-3 text-left sm:p-4"
+                  className="flex items-center gap-3 rounded-lg border-2 p-3 text-left sm:p-4"
                   style={{
                     borderColor:
                       hyperchromeBorderColors[item.name] ?? "#ffffff1a",
+                    backgroundColor:
+                      hyperchromeBgColors[item.name] ?? "transparent",
                   }}
                 >
                   <div className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">

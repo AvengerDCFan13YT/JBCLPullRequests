@@ -841,7 +841,7 @@ export default function ValueSuggestionDetailPage() {
                               Posted on{" "}
                               {formatMessageDate(suggestion.created_at)}
                               {suggestion.updated_at !== suggestion.created_at
-                                ? " (Edited)"
+                                ? " (Updated)"
                                 : ""}
                             </p>
                           </div>
@@ -1104,7 +1104,7 @@ export default function ValueSuggestionDetailPage() {
                         {/* Value change */}
                         <div className="border-border-card bg-secondary-bg rounded-xl border">
                           <div className="border-border-card border-b px-5 py-3.5">
-                            <h2 className="text-primary-text flex items-center justify-center gap-2 text-sm font-semibold">
+                            <h2 className="text-primary-text flex items-center gap-2 text-sm font-semibold">
                               <Icon
                                 icon="material-symbols:swap-vert-rounded"
                                 className="text-secondary-text h-4 w-4"
@@ -1340,7 +1340,7 @@ export default function ValueSuggestionDetailPage() {
                                     {suggesterStats.acceptance_rate.toFixed(0)}%
                                   </span>
                                 </div>
-                                <div className="bg-tertiary-bg h-1.5 overflow-hidden rounded-full">
+                                <div className="bg-quaternary-bg h-1.5 overflow-hidden rounded-full">
                                   <div
                                     className={`h-full rounded-full transition-all ${suggesterStats.acceptance_rate >= 50 ? "bg-button-success" : "bg-button-danger"}`}
                                     style={{
@@ -1350,7 +1350,7 @@ export default function ValueSuggestionDetailPage() {
                                 </div>
                               </div>
                               <div className="grid grid-cols-3 gap-2">
-                                <div className="bg-tertiary-bg rounded-lg p-2.5 text-center">
+                                <div className="bg-quaternary-bg rounded-lg p-2.5 text-center">
                                   <Icon
                                     icon="material-symbols:send-rounded"
                                     className="text-secondary-text mx-auto mb-1 h-4 w-4"
@@ -1358,7 +1358,7 @@ export default function ValueSuggestionDetailPage() {
                                   <p className="text-primary-text text-sm font-bold">
                                     {suggesterStats.total_submitted}
                                   </p>
-                                  <p className="text-secondary-text text-[10px]">
+                                  <p className="text-secondary-text text-xs">
                                     Submitted
                                   </p>
                                 </div>
@@ -1370,7 +1370,7 @@ export default function ValueSuggestionDetailPage() {
                                   <p className="text-button-success text-sm font-bold">
                                     {suggesterStats.total_accepted}
                                   </p>
-                                  <p className="text-secondary-text text-[10px]">
+                                  <p className="text-secondary-text text-xs">
                                     Accepted
                                   </p>
                                 </div>
@@ -1382,7 +1382,7 @@ export default function ValueSuggestionDetailPage() {
                                   <p className="text-button-danger text-sm font-bold">
                                     {suggesterStats.total_rejected}
                                   </p>
-                                  <p className="text-secondary-text text-[10px]">
+                                  <p className="text-secondary-text text-xs">
                                     Rejected
                                   </p>
                                 </div>
@@ -1452,7 +1452,7 @@ export default function ValueSuggestionDetailPage() {
                       {/* Value change */}
                       <div className="border-border-card bg-secondary-bg rounded-xl border">
                         <div className="border-border-card border-b px-5 py-3.5">
-                          <h2 className="text-primary-text flex items-center justify-center gap-2 text-sm font-semibold">
+                          <h2 className="text-primary-text flex items-center gap-2 text-sm font-semibold">
                             <Icon
                               icon="material-symbols:swap-vert-rounded"
                               className="text-secondary-text h-4 w-4"
@@ -1707,7 +1707,7 @@ export default function ValueSuggestionDetailPage() {
                                 <p className="text-primary-text text-sm font-bold">
                                   {suggesterStats.total_submitted}
                                 </p>
-                                <p className="text-secondary-text text-[10px]">
+                                <p className="text-secondary-text text-xs">
                                   Submitted
                                 </p>
                               </div>
@@ -1719,7 +1719,7 @@ export default function ValueSuggestionDetailPage() {
                                 <p className="text-button-success text-sm font-bold">
                                   {suggesterStats.total_accepted}
                                 </p>
-                                <p className="text-secondary-text text-[10px]">
+                                <p className="text-secondary-text text-xs">
                                   Accepted
                                 </p>
                               </div>
@@ -1731,7 +1731,7 @@ export default function ValueSuggestionDetailPage() {
                                 <p className="text-button-danger text-sm font-bold">
                                   {suggesterStats.total_rejected}
                                 </p>
-                                <p className="text-secondary-text text-[10px]">
+                                <p className="text-secondary-text text-xs">
                                   Rejected
                                 </p>
                               </div>
