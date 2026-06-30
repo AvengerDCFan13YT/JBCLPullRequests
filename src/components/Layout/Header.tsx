@@ -362,15 +362,15 @@ const MobileDrawer = memo(function MobileDrawer({
             onClick={onClose}
           />
           <MobileNavItem
-            href="/values/suggestions"
+            href="/items/suggestions"
             icon="material-symbols:lightbulb-outline-rounded"
-            label="Value Suggestions"
+            label="Item Suggestions"
             onClick={onClose}
           />
           <MobileNavItem
-            href="/values/changelogs"
+            href="/items/changelogs"
             icon="material-symbols:history-rounded"
-            label="Value Changelogs"
+            label="Item Changelogs"
             onClick={onClose}
           />
           <MobileNavItem

@@ -7,7 +7,7 @@ export function useIsCollabPage() {
     pathname === "/values" ||
     pathname.startsWith("/item") ||
     pathname.startsWith("/trading") ||
-    pathname.startsWith("/values/changelogs") ||
-    pathname.startsWith("/values/suggestions")
+    pathname.startsWith("/items/changelogs") ||
+    pathname.startsWith("/items/suggestions")
   );
 }

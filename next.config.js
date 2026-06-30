@@ -98,6 +98,31 @@ const nextConfig = {
         destination: "/hyperchrome-pity",
         permanent: true,
       },
+      {
+        source: "/items",
+        destination: "/values",
+        permanent: false,
+      },
+      {
+        source: "/values/changelogs",
+        destination: "/items/changelogs",
+        permanent: true,
+      },
+      {
+        source: "/values/changelogs/:path*",
+        destination: "/items/changelogs/:path*",
+        permanent: true,
+      },
+      {
+        source: "/values/suggestions",
+        destination: "/items/suggestions",
+        permanent: true,
+      },
+      {
+        source: "/values/suggestions/:path*",
+        destination: "/items/suggestions/:path*",
+        permanent: true,
+      },
     ];
   },
   async rewrites() {
